@@ -150,6 +150,7 @@ public class ChequeServiceImpl implements ChequeService {
         cheque.setUser(user);
         user.addCheque(cheque);
         cheque.setMenuItems(menuItemList);
+        chequeRepository.save(cheque);
 
         return SimpleResponse.builder()
                 .status(HttpStatus.OK)

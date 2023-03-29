@@ -16,7 +16,7 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
     List<SubCategoryResponse> findAllSubCategory();
 
 
-    @Query("select new company.dto.responses.subCategory.SubCategoryResponse(c.name) from SubCategory  c")
+    @Query("select new company.dto.responses.subCategory.SubCategoryResponse(c.name) from SubCategory  c where c.id=:id")
     Optional<SubCategoryResponse> findCategoryResponseById(Long id);
 
 

@@ -47,7 +47,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         if (menuItemRepository.existsByName(request.name())) {
          throw  new ConflictException((String.format("MenuItem with name: %s already exists!", request.name())));
         }
-        if (request.price() > 0) {
+        if (request.price() < 0) {
            throw new BadRequestException("Price not cannot be negative!");
         }
 
