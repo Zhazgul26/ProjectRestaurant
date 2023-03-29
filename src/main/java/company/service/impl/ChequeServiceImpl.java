@@ -13,10 +13,7 @@ import company.entity.User;
 import company.entity.enums.Role;
 import company.exeption.BadRequestException;
 import company.exeption.NotFoundException;
-import company.repository.ChequeRepository;
-import company.repository.MenuItemRepository;
-import company.repository.RestaurantRepository;
-import company.repository.UserRepository;
+import company.repository.*;
 import company.service.ChequeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,39 +31,35 @@ public class ChequeServiceImpl implements ChequeService {
     private final UserRepository userRepository;
     private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
+    private final StopListRepository stopListRepository;
 
     @Autowired
-    public ChequeServiceImpl(ChequeRepository chequeRepository, UserRepository userRepository, MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository) {
+    public ChequeServiceImpl(ChequeRepository chequeRepository, UserRepository userRepository, MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository,
+                             StopListRepository stopListRepository) {
         this.chequeRepository = chequeRepository;
         this.userRepository = userRepository;
         this.menuItemRepository = menuItemRepository;
         this.restaurantRepository = restaurantRepository;
 
+        this.stopListRepository = stopListRepository;
     }
 
 
     @Override
     public List<ChequeResponse> getAllCheque() {
-        int averagePrice = 0;
-
         List<Cheque> chequeList = chequeRepository.findAll();
         List<ChequeResponse> chequeResponseList = new ArrayList<>();
         for (Cheque cheque : chequeList) {
-            for (MenuItem menuItem : cheque.getMenuItems()) {
-                averagePrice += menuItem.getPrice();
-            }
-            int service = averagePrice * cheque.getUser().getRestaurant().getService() / 100;
-            int grandTotal = service + averagePrice;
+            int service = cheque.getPriceAverage() * cheque.getUser().getRestaurant().getService() / 100;
+            int grandTotal = service + cheque.getPriceAverage();
             ChequeResponse build = ChequeResponse.builder()
                     .service(cheque.getUser().getRestaurant().getService())
-                    .priceAverage(BigDecimal.valueOf(averagePrice))
+                    .priceAverage(BigDecimal.valueOf(cheque.getPriceAverage()))
                     .waiterFullName(cheque.getUser().getFirstName().concat(" ").concat(cheque.getUser().getLastName()))
                     .grandTotal(BigDecimal.valueOf(grandTotal))
                     .menuItems(convert(cheque.getMenuItems()))
                     .build();
             chequeResponseList.add(build);
-
-
         }
         return chequeResponseList;
     }
@@ -75,8 +68,6 @@ public class ChequeServiceImpl implements ChequeService {
     public SimpleResponse saveCheque(ChequeRequest request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID: %s not found!", request.userId())));
-
-
         int price = 0;
         Cheque cheque = new Cheque();
         List<MenuItem> menuItems = new ArrayList<>();
@@ -84,20 +75,24 @@ public class ChequeServiceImpl implements ChequeService {
         for (String menuItemName : request.menuItemName()) {
             MenuItem menuItem = menuItemRepository.findByName(menuItemName)
                     .orElseThrow(() -> new NotFoundException(String.format("MenuItemName with %s fot found", request.menuItemName())));
-            price += menuItem.getPrice();
-            menuItem.addCheque(cheque);
-        }
-        if (user.getRole().equals(Role.WAITER)) {
-            cheque.setPriceAverage(price);
-            cheque.setUser(user);
-            user.addCheque(cheque);
-            cheque.setMenuItems(menuItems);
-            cheque.setCreatedAt(LocalDate.now());
-            chequeRepository.save(cheque);
-        } else {
-            throw new BadRequestException("Given your waiter doesn't working here,You give error admin");
-        }
 
+            if (stopListRepository.count(LocalDate.now(), menuItem.getId()) > 0) {
+                throw new BadRequestException("Today there are no such dishes");
+            } else {
+                price += menuItem.getPrice();
+                menuItem.addCheque(cheque);
+            }
+            if (user.getRole().equals(Role.WAITER)) {
+                cheque.setPriceAverage(price);
+                cheque.setUser(user);
+                user.addCheque(cheque);
+                cheque.setMenuItems(menuItems);
+                cheque.setCreatedAt(LocalDate.now());
+                chequeRepository.save(cheque);
+            } else {
+                throw new BadRequestException("Given your waiter doesn't working here,You give error admin");
+            }
+        }
         return SimpleResponse.builder()
                 .status(HttpStatus.OK)
                 .message(String.format("Cheque with ID: %s successfully saved", cheque.getId()))

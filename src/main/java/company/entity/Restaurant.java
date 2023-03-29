@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "restaurants")
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "restaurant_seq")

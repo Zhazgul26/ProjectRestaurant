@@ -24,7 +24,8 @@ import java.util.stream.Collectors;
 public class SubCategoryServiceImpl implements SubCategoryService {
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
-@Autowired
+
+    @Autowired
     public SubCategoryServiceImpl(SubCategoryRepository subCategoryRepository, CategoryRepository categoryRepository) {
         this.subCategoryRepository = subCategoryRepository;
         this.categoryRepository = categoryRepository;
@@ -39,7 +40,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     @Override
     public SimpleResponse saveSubCategory(SubCategoryRequest request) {
         if (subCategoryRepository.existsByName(request.name())) {
-      throw  new ConflictException((String.format("SubCategory with name: %s already exists!", request.name())));
+            throw new ConflictException((String.format("SubCategory with name: %s already exists!", request.name())));
         }
 
         Category category = categoryRepository.findById(request.categoryId())
@@ -55,48 +56,49 @@ public class SubCategoryServiceImpl implements SubCategoryService {
         return SimpleResponse.builder()
                 .status(HttpStatus.OK)
                 .message(String.format("SubCategory with name %s successfully saved", subCategory.getName()))
-                .build();    }
+                .build();
+    }
 
     @Override
     public SubCategoryResponse findByIdSubCategory(Long id) {
         return subCategoryRepository.findCategoryResponseById(id)
-                .orElseThrow(()-> new NotFoundException(
-                String.format("SubCategory with ID: %s not found!",id)));
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("SubCategory with ID: %s not found!", id)));
     }
 
     @Override
     public SimpleResponse updateSubCategory(Long id, SubCategoryRequest request) {
-    SubCategory subCategory = subCategoryRepository.findById(id)
-            .orElseThrow(()-> new NotFoundException(
-                    String.format("SubCategory with ID: %s not found!",id)));
+        SubCategory subCategory = subCategoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("SubCategory with ID: %s not found!", id)));
 
-    Category category = categoryRepository.findById(request.categoryId())
-            .orElseThrow(()-> new NotFoundException(String.format("SubCategory with ID: %s not found", request.categoryId())));
-    subCategory.setName(request.name());
-    subCategory.setCategory(category);
-    subCategoryRepository.save(subCategory);
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new NotFoundException(String.format("SubCategory with ID: %s not found", request.categoryId())));
+        subCategory.setName(request.name());
+        subCategory.setCategory(category);
+        subCategoryRepository.save(subCategory);
 
-    return SimpleResponse.builder()
-            .status(HttpStatus.OK)
-            .message(String.format("SubCategory with ID : %s successfully updated !", id))
-            .build();
+        return SimpleResponse.builder()
+                .status(HttpStatus.OK)
+                .message(String.format("SubCategory with ID : %s successfully updated !", id))
+                .build();
     }
 
     @Override
     public SimpleResponse deleteSubCategory(Long id) {
-if(!subCategoryRepository.existsById(id)){
-throw new NotFoundException((String.format("SubCategory with ID: %s not found!",id)));
-}
-subCategoryRepository.deleteById(id);
-return SimpleResponse.builder()
-        .status(HttpStatus.OK)
-        .message(String.format("SubCategory with ID: %s successfully deleted",id))
-        .build();
-}
+        if (!subCategoryRepository.existsById(id)) {
+            throw new NotFoundException((String.format("SubCategory with ID: %s not found!", id)));
+        }
+        subCategoryRepository.deleteById(id);
+        return SimpleResponse.builder()
+                .status(HttpStatus.OK)
+                .message(String.format("SubCategory with ID: %s successfully deleted", id))
+                .build();
+    }
 
     @Override
-    public Map<String,List<SubCategoryResponsesByCategory>> groupingByCategory() {
-        List<SubCategoryResponsesByCategory> grouping = subCategoryRepository.findAllGrouping();
-        return grouping.stream().collect(Collectors.groupingBy(SubCategoryResponsesByCategory::categoryName));
+    public Map<String, List<SubCategoryResponsesByCategory>> groupingByCategory() {
+      return  subCategoryRepository.findAllGrouping().stream().
+              collect(Collectors.groupingBy(SubCategoryResponsesByCategory::categoryName));
     }
 }

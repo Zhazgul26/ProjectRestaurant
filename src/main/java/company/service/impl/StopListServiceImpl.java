@@ -31,7 +31,7 @@ public class StopListServiceImpl implements StopListService {
     @Override
     public SimpleResponse saveStopList(StopListRequest request) {
 
-    if (stopListRepository.count(request.date(), request.menuItemId())>= 0){
+    if (stopListRepository.count(request.date(), request.menuItemId())> 0){
         throw new NoSuchElementException("This dish is already on the menu today.");
     }
 

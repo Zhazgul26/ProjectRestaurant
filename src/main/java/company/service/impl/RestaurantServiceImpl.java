@@ -25,11 +25,13 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public SimpleResponse saveRestaurant(RestaurantRequest request) {
             List<Restaurant> all = restaurantRepository.findAll();
+
             if (all.size() > 0){
                 throw new BadRequestException("Only one restaurant will be!!");
             } else if (0 < request.service() && 50 < request.service()) {
                 throw new BadRequestException();
-            }else {
+
+            } else {
                 Restaurant restaurant = new Restaurant();
                 restaurant.setName(request.name());
                 restaurant.setLocation(request.location());
@@ -51,18 +53,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public RestaurantResponse getByIdRestaurant(Long id) {
-        Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Restaurant with ID: %s not found!", id)));
-        restaurant.setNumberOfEmployees(restaurant.getUsers().size());
-        restaurantRepository.save(restaurant);
-
         return restaurantRepository.findRestaurantResponseById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Restaurant with ID: %s not found!", id)));
     }
 
     @Override
     public SimpleResponse deleteRestaurant(Long id) {
+
         if (!restaurantRepository.existsById(id)) {
           throw new NotFoundException((String.format("Restaurant with ID: %s not found!",id)));
         }
@@ -80,6 +77,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         Restaurant restaurant = restaurantRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Restaurant with ID: %s not found! ", id)));
+
         restaurant.setName(request.name());
         restaurant.setLocation(request.location());
         restaurant.setResType(request.resType());

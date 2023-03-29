@@ -15,7 +15,7 @@ import static jakarta.persistence.CascadeType.*;
 @Table(name = "cheques")
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+
 public class Cheque {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cheque_seq")
