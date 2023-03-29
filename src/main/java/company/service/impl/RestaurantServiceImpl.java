@@ -27,14 +27,16 @@ public class RestaurantServiceImpl implements RestaurantService {
             List<Restaurant> all = restaurantRepository.findAll();
             if (all.size() > 0){
                 throw new BadRequestException("Only one restaurant will be!!");
+            } else if (0 < request.service() && 50 < request.service()) {
+                throw new BadRequestException();
+            }else {
+                Restaurant restaurant = new Restaurant();
+                restaurant.setName(request.name());
+                restaurant.setLocation(request.location());
+                restaurant.setResType(request.resType());
+                restaurant.setService(request.service());
+                restaurantRepository.save(restaurant);
             }
-            Restaurant restaurant = new Restaurant();
-            restaurant.setName(request.name());
-            restaurant.setLocation(request.location());
-            restaurant.setResType(request.resType());
-            restaurant.setService(request.service());
-            restaurantRepository.save(restaurant);
-
             return SimpleResponse.builder()
                     .status(HttpStatus.OK)
                     .message(String.format("Restaurant with name: %s is successfully saved",request.name()))
