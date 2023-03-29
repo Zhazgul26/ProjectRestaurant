@@ -38,7 +38,7 @@ public class User implements UserDetails {
     private Role role;
     private Integer experience;
 
-
+    private Boolean accepted;
 
     @ManyToOne(cascade = {CascadeType.PERSIST,MERGE, REFRESH, DETACH})
     @JoinColumn(name = "restaurant_id")

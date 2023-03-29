@@ -184,7 +184,6 @@ public class UserServiceImpl implements UserService {
 
         user.getCheques().forEach(cheque -> cheque.getMenuItems()
                 .forEach(menuItem -> menuItem.setCheques(null)));
-
         userRepository.delete(user);
 
         return SimpleResponse.builder()
@@ -195,7 +194,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public SimpleResponse application(UserRequest request) {
-
         Restaurant restaurant = restaurantRepository.findById(1L).orElseThrow(() -> new NotFoundException(
                 String.format("Restaurant with ID: %s not found!", 1L)));
         if (restaurant.getUsers().size() > 15) {
@@ -217,10 +215,9 @@ public class UserServiceImpl implements UserService {
             if (request.experience() <= 1) {
                throw  new BadRequestException("Cooking experience must be at least 2 years!");
             }
-
         } else if (request.role().equals(Role.WAITER)) {
-            int age = LocalDate.now().getYear() - request.dateOfBirth().getYear();
-            if (age < 18 || 30 < age) {
+            Period period = Period.between(request.dateOfBirth(), LocalDate.now());
+            if (period.getYears() < 18 || 30 < period.getYears()) {
                throw new BadRequestException("For the vacancy of a waiter, the age range is from 18 to 30 years!");
             }
             if (request.experience() <= 1) {
@@ -327,14 +324,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public PaginationResponse getUserPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<User> pageUsers = userRepository.findAll(pageable);
         PaginationResponse paginationResponse = new PaginationResponse();
-
         paginationResponse.setUsers(pageUsers.getContent());
         paginationResponse.setCurrentPage(pageable.getPageNumber());
         paginationResponse.setPageSize(pageUsers.getTotalPages());
