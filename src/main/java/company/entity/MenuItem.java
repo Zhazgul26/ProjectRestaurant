@@ -12,7 +12,7 @@ import static jakarta.persistence.CascadeType.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "menu_items")
+@Table(name = "menu_item")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

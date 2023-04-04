@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "restaurants")
+@Table(name = "restaurant")
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -25,7 +25,7 @@ public class Restaurant {
 
     private String resType;
 
-    private Integer numberOfEmployees;
+    private int numberOfEmployees = 0;
     private Integer service;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -39,6 +39,9 @@ public class Restaurant {
             users = new ArrayList<>();
         }
         users.add(user);
+        numberOfEmployees++;
+
+
     }
 
     public Restaurant(String name, String location, String resType, Integer numberOfEmployees, Integer service, List<User> users, List<MenuItem> menuItems) {

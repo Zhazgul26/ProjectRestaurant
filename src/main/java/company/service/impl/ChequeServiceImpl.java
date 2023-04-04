@@ -52,6 +52,7 @@ public class ChequeServiceImpl implements ChequeService {
         for (Cheque cheque : chequeList) {
             int service = cheque.getPriceAverage() * cheque.getUser().getRestaurant().getService() / 100;
             int grandTotal = service + cheque.getPriceAverage();
+
             ChequeResponse build = ChequeResponse.builder()
                     .service(cheque.getUser().getRestaurant().getService())
                     .priceAverage(BigDecimal.valueOf(cheque.getPriceAverage()))

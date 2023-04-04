@@ -15,6 +15,7 @@ import company.repository.UserRepository;
 import company.service.UserService;
 import jakarta.annotation.PostConstruct;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -139,6 +141,8 @@ public class UserServiceImpl implements UserService {
                 .restaurant(restaurant)
                 .build();
 
+        restaurant.addUser(user);
+
         userRepository.save(user);
 
         return SimpleResponse.builder()
@@ -178,13 +182,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public SimpleResponse deleteUsers(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException(
                 String.format("User with ID: %s not found!", id)));
 
+        Restaurant rest = restaurantRepository.findById(user.getRestaurant().getId()).orElseThrow();
+
         user.getCheques().forEach(cheque -> cheque.getMenuItems()
                 .forEach(menuItem -> menuItem.setCheques(null)));
         userRepository.delete(user);
+        rest.setNumberOfEmployees(rest.getNumberOfEmployees()-1);
 
         return SimpleResponse.builder()
                 .status(HttpStatus.OK)

@@ -2,7 +2,6 @@ package company.service;
 
 import company.dto.requests.MenuItemRequest;
 import company.dto.responses.SimpleResponse;
-import company.dto.responses.menuItem.MenuItemAllResponse;
 import company.dto.responses.menuItem.MenuItemResponse;
 import company.dto.responses.menuItem.MenuItemResponseSearch;
 import company.entity.MenuItem;

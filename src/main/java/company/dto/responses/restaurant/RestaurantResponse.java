@@ -8,7 +8,7 @@ public record RestaurantResponse(
         String name,
         String location,
         String resType,
-        Integer numberOfEmployees,
+        int numberOfEmployees,
         Integer service
 ) {
 }

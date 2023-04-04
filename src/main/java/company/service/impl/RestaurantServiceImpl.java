@@ -28,6 +28,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
             if (all.size() > 0){
                 throw new BadRequestException("Only one restaurant will be!!");
+
             } else if (0 < request.service() && 50 < request.service()) {
                 throw new BadRequestException();
 

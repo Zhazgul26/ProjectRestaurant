@@ -47,7 +47,6 @@ public class WebAppSecurity {
         return daoAuthenticationProvider;
     }
 
-
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
